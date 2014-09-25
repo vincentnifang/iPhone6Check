@@ -5,12 +5,15 @@ import webbrowser
 import urllib2
 import json
 import util
+import message
 
 
 
 Json_URL = "https://reserve.cdn-apple.com/HK/zh_HK/reserve/iPhone/availability.json"
 
 Output_URL = "https://reserve.cdn-apple.com/HK/zh_HK/reserve/iPhone/availability"
+
+mail_list = [""] # mazhaoqin mail
 def run(t):
     while(True):
         # response = requests.get(URL)
@@ -21,16 +24,21 @@ def run(t):
         html = urllib2.urlopen(Json_URL)
 
         context = json.loads(html.read())
+        tag = False
 
         for store in context.keys():
             if store != "updated":
                 for model in context[store].keys():
-                    # print util.getStore(a)+util.getMode(b)
+                    # print util.getStore(store)+util.getMode(model)
+
                     if context[store][model] == True:
+                        tag = True
                         print store+''+model
                         print util.getStore(store)+' '+util.getMode(model)
                         webbrowser.open_new_tab(Output_URL)
-                        time.sleep(120)
+                        message.send_mail(mail_list,"iphone",util.getStore(store)+' '+util.getMode(model))
+        if tag:
+            time.sleep(120)
         time.sleep(float(t))
 
 if __name__ == "__main__":
